@@ -39,6 +39,7 @@ pipeline {
                     
                     sh 'docker compose exec -T app chown -R www:www storage bootstrap/cache || true'
                     sh 'docker compose exec -T app php artisan optimize:clear || true'
+                    sh 'docker compose exec -T app php artisan key:generate --force --no-interaction || true'
                     sh 'docker compose exec -T app php artisan migrate --force || true'
                 }
             }
@@ -48,7 +49,7 @@ pipeline {
     post {
         success {
             echo '🎉 Laravel успешно развернут!'
-            echo 'Приложение: http://localhost:8000'
+            echo 'Приложение доступно: http://localhost:8000'
         }
         failure {
             echo '❌ Ошибка деплоя!'

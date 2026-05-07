@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     sh 'cp .env.production .env'
-                    sh 'composer install --no-dev --optimize-autoloader'
+                    sh 'composer install --no-dev --optimize-autoloader --no-interaction'
                 }
             }
         }
@@ -34,13 +34,12 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'docker-compose down --remove-orphans || true'
-                    sh 'docker-compose up -d --build'
+                    sh 'docker compose down --remove-orphans || true'
+                    sh 'docker compose up -d --build'
                     
-                    // Права на папки
-                    sh 'docker-compose exec -T app chown -R www:www storage bootstrap/cache || true'
-                    sh 'docker-compose exec -T app php artisan optimize:clear || true'
-                    sh 'docker-compose exec -T app php artisan migrate --force || true'
+                    sh 'docker compose exec -T app chown -R www:www storage bootstrap/cache || true'
+                    sh 'docker compose exec -T app php artisan optimize:clear || true'
+                    sh 'docker compose exec -T app php artisan migrate --force || true'
                 }
             }
         }
@@ -49,7 +48,7 @@ pipeline {
     post {
         success {
             echo '🎉 Laravel успешно развернут!'
-            echo 'Приложение доступно: http://localhost:8000'
+            echo 'Приложение: http://localhost:8000'
         }
         failure {
             echo '❌ Ошибка деплоя!'
